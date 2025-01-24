@@ -30,7 +30,7 @@ jobs:
       # Package the app
       - name: Build Linux executable
         run: |
-          pyinstaller --onefile --windowed --icon=circle_img.png --clean --distpath ./dist Form2Flow.py
+          pyinstaller --onefile --windowed --icon=circle_img.png --clean --distpath ./dist --arch arm64 Form2Flow.py
 
       # Upload the built executable as an artifact
       - name: Upload built app
