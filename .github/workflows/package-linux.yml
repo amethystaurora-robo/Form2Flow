@@ -1,1 +1,42 @@
 # Workflow for packaging Linux app
+
+name: Build Linux App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9.13"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      # Package the app
+      - name: Build Linux executable
+        run: |
+          pyinstaller --onefile --windowed --icon=circle_img.png Form2Flow.py
+
+      # Upload the built executable as an artifact
+      - name: Upload built app
+        uses: actions/upload-artifact@v3
+        with:
+          name: Form2Flow-Linux
+          path: dist/Form2Flow
