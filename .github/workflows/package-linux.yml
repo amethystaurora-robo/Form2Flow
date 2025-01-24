@@ -1,5 +1,3 @@
-# Workflow for packaging Linux app
-
 name: Build Linux App
 
 on:
