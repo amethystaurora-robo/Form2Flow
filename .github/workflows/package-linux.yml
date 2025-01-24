@@ -27,10 +27,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      # Build ARM64 version for Mac (M1 Chip)
-      - name: Build ARM64 version for Mac
+      # Debug Docker build process
+      - name: Debug Docker run (with ARM64)
         run: |
+          echo "Running Docker with ARM64 architecture..."
           docker run --rm --platform linux/arm64 -v $(pwd):/src pyinstaller/pyinstaller:latest --onefile --windowed --icon=circle_img.png Form2Flow.py
+        continue-on-error: true
 
       # Upload the built executable as an artifact
       - name: Upload built app
