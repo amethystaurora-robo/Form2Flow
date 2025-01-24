@@ -27,8 +27,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
+      # Install dependencies for ARM64 cross-compiling
+      - name: Install QEMU for ARM64 support
+        run: |
+          sudo apt-get update
+          sudo apt-get install qemu-user-static
+
       # Package the app
-      - name: Build Linux executable
+      - name: Build Linux ARM64 executable
         run: |
           pyinstaller --onefile --windowed --icon=circle_img.png --clean --distpath ./dist --arch arm64 Form2Flow.py
 
@@ -37,4 +43,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Form2Flow-Linux
-          path: ./dist/Form2Flow
+          path: dist/Form2Flow
