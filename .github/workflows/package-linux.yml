@@ -27,14 +27,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
 
-      # Package the app
-      - name: Build Linux executable
+      # Build ARM64 version for Mac (M1 Chip)
+      - name: Build ARM64 version for Mac
         run: |
-          pyinstaller --onefile --windowed --icon=circle_img.png Form2Flow.py
+          docker run --rm --platform linux/arm64 -v $(pwd):/src pyinstaller/pyinstaller:latest --onefile --windowed --icon=circle_img.png Form2Flow.py
 
       # Upload the built executable as an artifact
       - name: Upload built app
         uses: actions/upload-artifact@v3
         with:
-          name: Form2Flow-Linux
+          name: Form2Flow-Linux-ARM64
           path: dist/Form2Flow
