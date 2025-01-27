@@ -7,3 +7,6 @@ This repository provides source code for input generation. Two identical source 
 To understand the flow of the code, please download the attachment.
 
 [form2flow_layout.pdf](https://github.com/user-attachments/files/18524766/form2flow_layout.pdf)
+
+Download the app:
+https://github.com/amethystaurora-robo/MultiFlow3D/releases/tag/v1.2.0
