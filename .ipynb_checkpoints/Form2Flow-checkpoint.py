@@ -237,9 +237,8 @@ lpt_sections = [
     }
 ]
 
-# +
-#Fraction Sections in LPT are dynamic, where depending on the user choice of lagrangian fractions, the form will be created 
-#multiple times
+# Fraction Sections in LPT are dynamic, where depending on the user choice of lagrangian fractions, the form will be created 
+# multiple times
 
 fraction_lpt_sections = [
     {
@@ -272,7 +271,6 @@ fraction_lpt_sections = [
         ]
     }
 ]
-# -
 
 #Infodom sections contain 9 questions
 infodom_sections = [
@@ -914,6 +912,13 @@ def create_infodom(filename,overwrite=True):
     domain = list(range(total_block_num))
     rdiv = [1]*total_block_num
     print(block_dimension_x)
+
+    for floats in domain:
+        int(floats)
+    print("Domain after casting:",domain)
+    for floats in rdiv:
+        int(floats)
+    print("rdiv after casting:",rdiv)
     
     #get initial coordinates for infodom
     def get_coords(sub_domain,block_dimension):
@@ -944,6 +949,7 @@ def create_infodom(filename,overwrite=True):
     
     infodom_coord_df = pd.DataFrame({'Domain':domain,'rdiv':rdiv,'x1':x1_repeated,'x2':x2_repeated,
                                     'y1':y1_repeated,'y2':y2_repeated,'z1':z1_repeated,'z2':z2_repeated})
+    print(infodom_coord_df)
     
     #Hard-code the length of the equal signs line to 49 to create headers
     equals_line = "=" * 49
@@ -964,14 +970,15 @@ def create_infodom(filename,overwrite=True):
             f.write(equals_line + "\n")
             #Write the DataFrame as a space-separated format with no column or row names, with centered rows
             for index, row in infodom_coord_df.iterrows():
-                f.write(f"{row['Domain']}  "
-                        f"{row['rdiv']}  "
+                f.write(f"{int(row['Domain'])}  "
+                        f"{int(row['rdiv'])}  "
                         f"{row['x1']}  "
                         f"{row['x2']}  "
                         f"{row['y1']}  "
                         f"{row['y2']}  "
                         f"{row['z1']}  "
                         f"{row['z2']}\n")
+                print(row)
             #Add the line of equals signs at the end of the file
             f.write(equals_line + "\n")
             f.write(footer)
@@ -1024,7 +1031,7 @@ def create_mdmap_file_with_columns(filename, overwrite=True):
 
         #Hard-code the length of the equal signs line to 49 for header
         equals_line = "=" * 49
-        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{num_processors} number of processors\n{equals_line}\n"
+        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{num_processors*total_block_num} number of processors\n{equals_line}\n"
 
         #Ask user for file name
         if not overwrite and os.path.exists(filename):
@@ -1149,7 +1156,6 @@ def create_section(section, parent_frame,entries):
         options = question.get("options", [])  # Use .get() in case there are no options
         default_value = question.get("default", None)
         create_question(key,question_text, input_type, options, section_frame, default_value,entries)
-    
 
 
 # -
@@ -1228,9 +1234,11 @@ def update_lpt_sections(lpt_entries, parent_frame):
         create_section(section, parent_frame, lpt_entries)
     
 
+
 # -
 
 # If the user submits and decides they want to keep editing and submit again, these functions allow the page to be refreshed (and the dictionaries to be refreshed) while saving the previous inputs. This allows for small edits on files after submitting. 
+#
 
 # +
 #Function to save current user input values
@@ -1269,7 +1277,6 @@ def refresh_page():
     error_messages = saved_error_messages
 
 
-
 # -
 
 # A submit button is added to each tab. The logic for submit is typically calling 1-2 functions, handled for each tab in dictionaries within main
@@ -1302,7 +1309,7 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
     for key, var in entries.items():
         #Check if the variable is a widget (has a .get method), otherwise it's a plain string
         if hasattr(var, "get"):
-            value = var.get()  #Retrieve value from the widget
+            value = var.get().strip()  #Retrieve value from the widget
         else:
             value = var  #If it's not a widget, it's already a string
         print(f"Key: {key} var {value}")
@@ -1424,6 +1431,7 @@ def initialize_tabs(sections_dict, advanced_sections_dict, entries_dict, file_cr
 
         #Add the Advanced Options button for this tab if it exists (for control only)
         add_advanced_button_to_tab(tab_name, advanced_sections_dict.get(tab_name, []))
+
 
 
 # -
@@ -1592,8 +1600,6 @@ if not splash_shown:
 
 main()
 # -
-
-
 
 
 
