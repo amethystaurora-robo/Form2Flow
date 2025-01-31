@@ -185,7 +185,8 @@ advanced_control_sections = [
             {"key":"pl_ex","question":"pl_ex (# of extra ghost planes. pl_ex=0 -> blocks have only 1 ghost layer):", 
              "input_type":"int","default":2},
             {"key":"th","question":"Th:","input_type":"float","default":293},
-            {"key":"tc","question":"Tc:","input_type":"float","default":293}
+            {"key":"tc","question":"Tc:","input_type":"float","default":293},
+            {"key":"tinit","question":"Tinit:","input_type":"float","default":273}
         ]
     },
     {
@@ -476,7 +477,7 @@ def create_control_dfs():
             f"{control_entries['lpt']} {control_entries['LSM']} {control_entries['L_LSMbase']}",
             f"{control_entries['lscalar']} {control_entries['l_active_scalar']} {control_entries['l_non_newt']}",
             f"{control_entries['pl_ex']}",
-            f"{control_entries['th']} {control_entries['tc']}"
+            f"{control_entries['th']} {control_entries['tc']} {control_entries['tinit']}"
         ],
         "Parameter": [
             f"{'time_averaging'}, {'t_start_averaging1'}, {'t_start_averaging2'}, {'noise'}",
@@ -486,7 +487,7 @@ def create_control_dfs():
             f"{'LPT'}, {'LSM'}, {'L_LSMbase'}",
             f"{'LSCALAR'}, {'LActiveScalar'} {'LNonNewt'}",
             f"{'pl_ex (# of extra ghost planes. pl_ex=0 -> blocks have only 1 ghost layer)'}",
-            f"{'Th'}, {'Tc'}"
+            f"{'Th'}, {'Tc'}, {'Tinit'}"
         ]
     })
     
@@ -1031,7 +1032,7 @@ def create_mdmap_file_with_columns(filename, overwrite=True):
 
         #Hard-code the length of the equal signs line to 49 for header
         equals_line = "=" * 49
-        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{num_processors*total_block_num} number of processors\n{equals_line}\n"
+        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{total_processors_num} number of processors\n{equals_line}\n"
 
         #Ask user for file name
         if not overwrite and os.path.exists(filename):
