@@ -368,7 +368,8 @@ mapping_dict = {"Exp.Euler":1,
                         "3D":0,
                         "2D plane-XY":1,
                         "2D plane-ZY":2,
-                        "2D plane-ZX":3
+                        "2D plane-ZX":3,
+                        "None":1
                        }
 
 
@@ -1313,7 +1314,7 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
             value = var.get().strip()  #Retrieve value from the widget
         else:
             value = var  #If it's not a widget, it's already a string
-        print(f"Key: {key} var {value}")
+        #print(f"Key: {key} var {value}")
         
         if isinstance(var, CTkEntry):
             try:
@@ -1330,6 +1331,7 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
                 entries[key] = mapped_value  # Replace with mapped value
             else:
                 entries[key] = value  # Retain original value if no mapping
+            print(f"Key: {key} var {value}")
 
     #Step 3: Create a temporary placeholder filename to create the file and check for errors before user is asked to save
     with tempfile.NamedTemporaryFile(delete=False, suffix=".cin") as temp_file:
