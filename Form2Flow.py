@@ -53,7 +53,7 @@ control_sections = [
              "input_type": "dropdown","options":["2nd order CDS", "4th order CDS","WENO"]},
             {"key":"dt","question":"Which timestep do you want?","input_type":"float"},
             {"key":"itime_end","question":"How many timesteps do you want to run?","input_type":"int"},
-            {"key":"restart","question": "Is this a restart?","input_type":"radio","options":["yes","no"]},
+            {"key":"restart","question": "Is this a restart?","input_type":"radio","options":["yes","no"],"default":"no"},
             {"key":"reinitmean","question":"Do you want to calculate statistics from scratch?",
              "input_type":"radio","options":["YES","NO"]},
             {"key":"n_out","question":"How often do you want to produce outputs (tecbins)?","input_type":"int"},
@@ -100,17 +100,18 @@ control_sections = [
             {"key":"ctime_averaging","question":"At which ctime do you want to start collecting statistics?",
              "input_type": "float"}, 
             {"key":"SGS_model_choice","question":"Which SGS model do you want?", "input_type":"dropdown",
-             "options": ["None","Smagorinsky","WALE","OneEqnModel","k-eps model (RANS)"]},
+             "options": ["None","Smagorinsky","WALE","OneEqnModel","k-eps model (RANS)"],"default":"Smagorinsky"},
             {"key":"limb","question":"Do you want immersed boundaries to be on or off?","input_type": "radio",
-             "options": ["on", "off"]},
-            {"key":"lenergy","question":"Do you want energy equation?","input_type":"radio","options": ["yes", "no"]},
+             "options": ["on", "off"],"default":"off"},
+            {"key":"lenergy","question":"Do you want energy equation?","input_type":"radio","options": ["yes", "no"],"default":"no"},
             {"key":"lpt","question":"Do you want to create lagrangian particles?","input_type":"radio",
-             "options": ["yes", "no"]},
-            {"key":"LSM","question":"Do you want to use LSM?","input_type":"radio","options":["yes","no"]},
-            {"key":"L_LSMbase","question":"Do you want to use LSM base?","input_type":"radio","options":["yes","no"]},
-            {"key":"lscalar","question":"Passive scalar?","input_type":"radio","options": ["yes", "no"]},
-            {"key":"l_active_scalar","question":"Active scalar?","input_type":"radio","options":["yes","no"]},
-            {"key":"l_non_newt","question":"L Non Newtonian?","input_type":"radio","options":["yes","no"]}
+             "options": ["yes", "no"],"default":"no"},
+            {"key":"LSM","question":"Do you want to use LSM?","input_type":"radio","options":["yes","no"],"default":"no"},
+            {"key":"L_LSMbase","question":"Do you want to use LSM base?","input_type":"radio","options":["yes","no"],
+             "default":"no"},
+            {"key":"lscalar","question":"Passive scalar?","input_type":"radio","options": ["yes", "no"],"default":"no"},
+            {"key":"l_active_scalar","question":"Active scalar?","input_type":"radio","options":["yes","no"],"default":"no"},
+            {"key":"l_non_newt","question":"L Non Newtonian?","input_type":"radio","options":["yes","no"],"default":"no"}
         ]
     }
 ]
@@ -278,9 +279,6 @@ infodom_sections = [
     {
         "section_name": "Infodom Parameters",
         "questions": [
-            {"key": "grid_size_x","question": "What is the grid size for x?","input_type":"float"},
-            {"key": "grid_size_y","question": "What is the grid size for y?","input_type":"float"},
-            {"key": "grid_size_z","question": "What is the grid size for z?","input_type":"float"},
             {"key": "domain_length","question": "How long is your domain in meters?","input_type":"float"},
             {"key": "domain_width","question": "How wide is your domain in meters?","input_type":"float"},
             {"key": "domain_height","question": "How high is your domain in meters?","input_type":"float"},
@@ -297,7 +295,7 @@ mdmap_sections = [
     {
         "section_name":"Processors Assignment",
         "questions": [
-            {"key":"num_processors","question":"How many processors do you want to assign to each domain? (Default of 1).",
+            {"key":"num_domains","question":"How many domains do you want to assign to each processor? (Default of 1).",
              "input_type":"int","default":1}
         ]
     }
@@ -377,6 +375,15 @@ mapping_dict = {"Exp.Euler":1,
 
 #Create control dataframes
 def create_control_dfs():
+
+    global dx 
+    global dy
+    global dz
+
+    dx = float(control_entries['dx'])
+    dy = float(control_entries['dy'])
+    dz = float(control_entries['dz'])
+    
     
     #logic for density and kinematic viscosity
     density = 0
@@ -394,7 +401,7 @@ def create_control_dfs():
     numeric_params = pd.DataFrame({
         "Value": [
             f"{control_entries['keyword']} {control_entries['ubulk']}",
-            f"{control_entries['dx']} {control_entries['dy']} {control_entries['dz']}",
+            f"{dx} {dy} {dz}",
             f"{density} {kinematic_visc} {control_entries['pr']} {control_entries['turb_schmidt']} {control_entries['beta']}",
             f"{control_entries['gx']} {control_entries['gy']} {control_entries['gz']}",
             f"{control_entries['convection_scheme']}",
@@ -801,14 +808,25 @@ def get_integer_values(var_name,isinteger,og_sub_domain,og_grid_size,grid_size,s
 
 #create the infodom file using user input to make calculations for blocks, find coordinates for each block
 def create_infodom(filename,overwrite=True):
+
+    global dx
+    global dy
+    global dz
+    
+    #Display error if the user has not submitted the infodom file first
+    if 'dx' not in globals() or dx is None:
+        print("control entries has not been added.")
+        error_msg = f"Mesh size is not defined. Please ensure you have created the control file before submitting this tab."
+        error_messages.append(error_msg)
+        return
     
     #access user inputs
     domain_length = float(infodom_entries['domain_length'])
     domain_width = float(infodom_entries['domain_width'])
     domain_height = float(infodom_entries['domain_height'])
-    grid_size_x = float(infodom_entries['grid_size_x'])
-    grid_size_y = float(infodom_entries['grid_size_y'])
-    grid_size_z = float(infodom_entries['grid_size_z'])
+    grid_size_x = dx
+    grid_size_y = dy
+    grid_size_z = dz
     sub_domain_i = int(infodom_entries['sub_domain_i'])
     sub_domain_j = int(infodom_entries['sub_domain_j'])
     sub_domain_k = int(infodom_entries['sub_domain_k'])
@@ -899,7 +917,7 @@ def create_infodom(filename,overwrite=True):
                                        'Sub-domains': [sub_domain_i,sub_domain_j,sub_domain_k,sub_domain_i*sub_domain_j*sub_domain_k],
                                        'Cells per Block': [cells_per_block_x,cells_per_block_y,cells_per_block_z,cells_per_block_x*cells_per_block_y*cells_per_block_z]})
 
-    print(infodom_initial_df)
+    #print(infodom_initial_df)
     
     #individual block dimension calculation
     block_dimension_x = domain_length/sub_domain_i
@@ -913,14 +931,14 @@ def create_infodom(filename,overwrite=True):
     #column 1 is a list iterating total_block_num times
     domain = list(range(total_block_num))
     rdiv = [1]*total_block_num
-    print(block_dimension_x)
+    #print(block_dimension_x)
 
     for floats in domain:
         int(floats)
-    print("Domain after casting:",domain)
+    #print("Domain after casting:",domain)
     for floats in rdiv:
         int(floats)
-    print("rdiv after casting:",rdiv)
+    #print("rdiv after casting:",rdiv)
     
     #get initial coordinates for infodom
     def get_coords(sub_domain,block_dimension):
@@ -951,7 +969,7 @@ def create_infodom(filename,overwrite=True):
     
     infodom_coord_df = pd.DataFrame({'Domain':domain,'rdiv':rdiv,'x1':x1_repeated,'x2':x2_repeated,
                                     'y1':y1_repeated,'y2':y2_repeated,'z1':z1_repeated,'z2':z2_repeated})
-    print(infodom_coord_df)
+    #print(infodom_coord_df)
     
     #Hard-code the length of the equal signs line to 49 to create headers
     equals_line = "=" * 49
@@ -995,6 +1013,8 @@ def create_infodom(filename,overwrite=True):
     return 
 
 
+# The MDmap file assigns domains to processors. Processor IDs are stored in the first column, how many domains assigned to that processor (based on user input, or default of 1) are stored in Column 2, and the Domain IDs are stored in Column 3. There may be many domain IDs in one column, depending how many domains are assigned to a given processor.
+
 #Create MDmap file
 def create_mdmap_file_with_columns(filename, overwrite=True):
     
@@ -1007,33 +1027,46 @@ def create_mdmap_file_with_columns(filename, overwrite=True):
         return
 
     try:
-        #Access the processor count
-        num_processors = int(mdmap_entries['num_processors'])
-        print("Processors assigned.")
-    
-        #Create processor_num column for file
-        num_processor_list = []
-        current_processor_num = 0
-        while current_processor_num < total_block_num:
-            num_processor_list.append(num_processors)
-            current_processor_num += 1
+        #Access user entries
+        num_domains = int(mdmap_entries['num_domains'])
+        print("Num domains:",num_domains)
+        
+        #Calculate total processors
+        total_processors = total_block_num // num_domains  # Integer division
+        remainder = total_block_num % num_domains  # Get remaining domains
+        print("Total processors:",total_processors)
+        print("Remainder:",remainder)
+        
+        # If there's a remainder, we need an extra processor
+        if remainder > 0:
+            total_processors += 1
+        
+        # Create processor ID list for left-most column
+        processor_ID_list = list(range(total_processors))
+        print("Processor ID list:", processor_ID_list)
+        
+        # Create num_domains_list (same value for all processors)
+        num_domains_list = [num_domains] * (total_processors - 1) + [remainder] if remainder > 0 else []
+        print("Num_domains_list:",num_domains_list)
 
-        #calculate processors 
-        total_processors_num = total_block_num * num_processors
-        domains_processors_ID_list = list(range(total_processors_num))
+        # Calculate and format domain IDs for right-most column
+        domain_ID_list = list(range(total_block_num))
         ID_list = [
-            " ".join(map(str, domains_processors_ID_list[i:i + num_processors]))
-            for i in range(0, len(domains_processors_ID_list), num_processors)
+            " ".join(map(str, domain_ID_list[i:i + num_domains]))
+            for i in range(0, len(domain_ID_list), num_domains)
         ]
+        print("Domain ID list:", ID_list)
+        
+        # Create DataFrame
+        domain_processor_df = pd.DataFrame({'Processor ID': processor_ID_list,
+                                            'Num Domains': num_domains_list, 
+                                            'Sub-Domain ID': ID_list})
 
-        #create dataframe
-        domain_processor_df = pd.DataFrame({'Sub-Domain ID': ID_list,
-                                            'Num Processors': num_processor_list, 
-                                            'Processor ID': ID_list})
+        print(domain_processor_df)
 
         #Hard-code the length of the equal signs line to 49 for header
         equals_line = "=" * 49
-        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{total_processors_num} number of processors\n{equals_line}\n"
+        header = f"{' '*8}{total_block_num} number of domains\n{' '*8}{total_processors} number of processors\n{equals_line}\n"
 
         #Ask user for file name
         if not overwrite and os.path.exists(filename):
@@ -1044,9 +1077,9 @@ def create_mdmap_file_with_columns(filename, overwrite=True):
         with open(filename, "w") as f:
             f.write(header)
             for index, row in domain_processor_df.iterrows():
-                f.write(f"{str(row['Sub-Domain ID']).rjust(4)}  "
-                        f"{str(row['Num Processors']).rjust(4)}  "
-                        f"{str(row['Processor ID']).rjust(4)}\n")
+                f.write(f"{str(row['Processor ID']).rjust(4)}  "
+                        f"{str(row['Num Domains']).rjust(4)}  "
+                        f"{str(row['Sub-Domain ID']).rjust(4)}\n")
             f.write(equals_line + "\n")
         
         print(f"File '{filename}' created successfully!")
@@ -1166,7 +1199,33 @@ def create_section(section, parent_frame,entries):
 
 # +
 def open_advanced_popup(sections, entries):
-    
+    global saved_user_inputs
+
+    # Check if the popup already exists
+    popup_exists = hasattr(open_advanced_popup, "popup")
+    print(f"Popup attribute exists: {popup_exists}")
+
+    if popup_exists and open_advanced_popup.popup is not None:
+        popup_still_exists = open_advanced_popup.popup.winfo_exists()
+        print(f"Popup window still exists: {popup_still_exists}")
+    else:
+        popup_still_exists = False
+        
+    if popup_exists and popup_still_exists == True:
+        open_advanced_popup.popup.deiconify()  # Show the hidden popup
+        open_advanced_popup.popup.lift()  # Bring it to the front
+
+        # Restore the saved inputs to the popup fields
+        restore_user_inputs({"Control": saved_user_inputs.get("Control", {})}, {"Control": entries})
+        return
+
+    print("Creating a lil window.")
+
+    # Restore user inputs on the popup when reopened
+    if saved_user_inputs.get("Control"):
+        restore_user_inputs({"Control": saved_user_inputs.get("Control", {})}, {"Control": entries})
+        print("User inputs restored in the popup.")
+        
     popup_window = ctk.CTkToplevel()
     popup_window.title("Advanced Options")
     popup_window.geometry("500x400")
@@ -1180,6 +1239,8 @@ def open_advanced_popup(sections, entries):
     def handle_submit(entries):
         # Hide the popup window after submission
         popup_window.withdraw()
+        open_advanced_popup.popup = popup_window
+        print("Popup hidden but still exists.")
     
     # Submit button to confirm inputs
     submit_button = ctk.CTkButton(
@@ -1253,6 +1314,7 @@ def save_user_inputs(entries_dict):
                 saved_values[tab_name][key] = field.get()
             else:
                 saved_values[tab_name][key] = field  #For plain string values
+    #print("Saved values:",saved_values)
     return saved_values
 
 #Function to restore user inputs into fields
@@ -1307,6 +1369,11 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
             
     error_messages.clear()
     
+    # Reset the popup state to allow reopening the popup on the next trigger
+    open_advanced_popup.popup = None  # This resets the popup variable
+    if open_advanced_popup.popup == None:
+        print("Advanced popup reset to none.")
+    
      #Step 1: Validate inputs and populate the dictionary
     for key, var in entries.items():
         #Check if the variable is a widget (has a .get method), otherwise it's a plain string
@@ -1331,7 +1398,7 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
                 entries[key] = mapped_value  # Replace with mapped value
             else:
                 entries[key] = value  # Retain original value if no mapping
-            print(f"Key: {key} var {value}")
+            #print(f"Key: {key} var {value}")
 
     #Step 3: Create a temporary placeholder filename to create the file and check for errors before user is asked to save
     with tempfile.NamedTemporaryFile(delete=False, suffix=".cin") as temp_file:
@@ -1355,7 +1422,7 @@ def submit_inputs(entries,file_creation_function,dfs_function=None, headers=None
         error_label.configure(text=error_label_text)
         print("Error during file creation:", e)
 
-        #Step 5a: If there are validation errors, display them and exit
+    #Step 5a: If there are validation errors, display them and exit
     if error_messages:
         error_label_text = "\n".join(error_messages)
         error_label.configure(text=error_label_text)  # Display errors
@@ -1585,7 +1652,7 @@ def main():
     #On refresh, when the main function is called again, this will evaluate to True if the user has entered values
     if saved_user_inputs:
         print("Inputs were saved.")
-        print(saved_user_inputs)
+        #print("On check if inputs were saved:",saved_user_inputs)
         restore_user_inputs(saved_user_inputs, entries_dict) 
 
     if error_messages:  #Show error message if there are any
