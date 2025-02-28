@@ -1,1 +1,45 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches:
+      - main  # This workflow will run on code pushes to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Also trigger this workflow for PRs to the 'main' branch
+
+jobs:
+  build:
+    runs-on: windows-latest  # Use a Windows environment to build the executable
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'  # Specify your desired Python version, e.g., '3.9'
+
+      # Step 3: Install Python dependencies (including pyinstaller)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip  # Upgrade pip to the latest version
+          pip install -r requirements.txt      # Install dependencies from your requirements.txt
+          pip install pyinstaller              # Install PyInstaller to build the executable
+
+      # Step 4: Build the Windows executable using pyinstaller
+      - name: Build Windows Executable
+        run: |
+          pyinstaller --onefile your_script.py  # Replace 'your_script.py' with your actual script name
+          # The '--onefile' option ensures a single .exe file is created instead of multiple files
+
+      # Step 5: Upload the built executable as an artifact (for later download)
+      - name: Upload executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-windows-app-executable  # Name of the artifact for easy reference
+          path: dist/your_script.exe  # Path to the .exe file created by PyInstaller
 
