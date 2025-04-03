@@ -20,7 +20,7 @@ Click below to understand the flow of the code.
 
 <p align="left">
   <a href="[https://github.com/amethystaurora-robo/MultiFlow3D/releases](https://github.com/amethystaurora-robo/Form2Flow/blob/main/form2flow_layout.pdf)" target="_blank">
-    <img src="https://img.shields.io/badge/Code%20Layout-3AAFA9?style=for-the-badge&logo=pdf&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Code%20Layout-3AAFA9?style=for-the-badge&logo=readthedocs&logoColor=white"/>
   </a>
 </p>
 
