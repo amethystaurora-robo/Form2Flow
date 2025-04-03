@@ -6,7 +6,7 @@ As a Research Assistant, I was involved in modifying simulation code for computa
 </p>
 <p
   <a href="https://github.com/amethystaurora-robo/MultiFlow3D/releases" target="_blank">
-    <img src="https://img.shields.io/badge/Download%20App-7d3f4e?style=for-the-badge&logo=googleplay&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Download%20App-3AAFA9?style=for-the-badge&logo=googleplay&logoColor=white"/>
   </a>
 </p>
 
@@ -20,7 +20,7 @@ Click below to understand the flow of the code.
 
 <p align="left">
   <a href="[https://github.com/amethystaurora-robo/MultiFlow3D/releases](https://github.com/amethystaurora-robo/Form2Flow/blob/main/form2flow_layout.pdf)" target="_blank">
-    <img src="https://img.shields.io/badge/Code%20Layout-7d3f4e?style=for-the-badge&logo=googleplay&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Code%20Layout-3AAFA9?style=for-the-badge&logo=adobeacrobatreader&logoColor=white"/>
   </a>
 </p>
 
